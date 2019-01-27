@@ -1,0 +1,87 @@
+-> Pending Intent
+
+	- example:
+
+	Intent intent = new Intent("com.my", "com.my.MyActivity");
+
+	PendingIntent.getActivity(context, 123, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+	
+
+	- создание 
+
+		- public static PendingIntent getActivity(Context context, int requestCode, @NonNull Intent intent, @Flags int flags, @Nullable Bundle options);
+
+		- public static PendingIntent getActivities(Context context, int requestCode, @NonNull Intent[] intents, @Flags int flags, @Nullable Bundle options);
+
+		- public static PendingIntent getBroadcast(Context context, int requestCode, @NonNull Intent intent, @Flags int flags);
+
+		- public static PendingIntent getService(Context context, int requestCode, @NonNull Intent intent, @Flags int flags);
+
+	
+
+	- flags:
+
+		- FLAG_NO_CREATE - если нет похожего, то не будет создан
+
+		- FLAG_CANCEL_CURRENT - удалит существующий
+
+		- FLAG_UPDATE_CURRRENT - заменит extra в существующем
+
+		- FLAG_IMMUTABLE - pendingintent должен быть неизменным
+
+		- FLAG_ONE_SHOT - сработает лишь один раз
+
+	
+
+	- может использоваться как асинхронный способ взаимодействия с сервисом. 
+
+		- оборачивает интент с возможностью вернуть результат
+
+		- работает асинхронно. Т.е. ответ получаем не сразу
+
+		- можем передать только parcelable
+
+		
+
+	- при использовании с сервисами мы достаем pendingintent в onStartCommand:
+
+	
+
+	public class MyService extends Service {
+
+		public int onStartCommand(Intent intent, int flags, int startId) {
+
+			PendingIntent pi = intent.getParcelableExtra("param_name");
+
+			//...
+
+			
+
+			try {
+
+				pi.send(MyService.this, O, intent);
+
+			} catch (PendingIntent.CanceledException e) {
+
+				e.printStackTrace();
+
+			}
+
+			
+
+			return super.onStartCommand(intent, flags, startId);
+
+		}
+
+		
+
+		//...
+
+	}
+
+	
+
+
+
+#Android #PendingIntent

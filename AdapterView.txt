@@ -1,0 +1,217 @@
+-> Adapterview
+
+	- AdapterView - abstract class 
+
+	- ListView, GridView, Gallery, Spinner, ExpandableListView
+
+	- Не наследуются от AdapterView: RecyclerView, ViewPager
+
+	- ListView наследовать от BaseAdapter
+
+	- ListView переиспользует View ушедшие за экран
+
+	- паттерн ViewHolder
+
+		if (convertView == null) {
+
+		...
+
+		convertView.setTag(holder)
+
+		}
+
+		ViewHolder holder = (ViewHolder) convertView.getTag();
+
+		holder.textView.setText("lkdkgkdfjfgl");
+
+		return convertView;
+
+		
+
+-> RecyclerView
+
+	- LayoutManager
+
+	
+
+-> ViewPager
+
+	- PageAdapter
+
+-> RecyclerView:
+
+class RecyclerViewAdapter(private var items: List<Character>,
+
+                          private val layoutResId: Int,
+
+                          private var itemClick: Character.() -> Unit = {})
+
+    : RecyclerView.Adapter<RecyclerViewAdapter.Holder>() {
+
+    class Holder(itemView: View) : RecyclerView.ViewHolder(itemView)
+
+
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+
+        val view = parent inflate layoutResId
+
+        val viewHolder = Holder(view)
+
+        val itemView = viewHolder.itemView
+
+        itemView.setOnClickListener {
+
+            val adapterPosition = viewHolder.adapterPosition
+
+            if (adapterPosition != RecyclerView.NO_POSITION) {
+
+                onItemClick(adapterPosition)
+
+            }
+
+        }
+
+        return viewHolder
+
+    }
+
+
+
+    override fun getItemCount() = items.size
+
+
+
+    override fun onBindViewHolder(holder: Holder, position: Int) {
+
+        val item = items[position]
+
+        holder.itemView.bind(item)
+
+    }
+
+....
+
+------
+
+-> ListView 
+
+class ListViewAdapter(context: Context,
+
+                      private val items: List<Character>,
+
+                      private var itemClick: Character.() -> Unit = {})
+
+    : BaseAdapter() {
+
+
+
+    private val inflator: LayoutInflater = LayoutInflater.from(context)
+
+
+
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
+
+        val view: View?
+
+        val viewHolder: ListViewHolder
+
+        if (convertView == null) {
+
+            view = inflator.inflate(R.layout.item_view, parent, false)
+
+            viewHolder = ListViewHolder(view)
+
+            view?.tag = viewHolder
+
+        } else {
+
+            view = convertView
+
+            viewHolder = view.tag as ListViewHolder
+
+        }
+
+        val item = items[position]
+
+        with(viewHolder) {
+
+            name.text = item.name
+
+            date.text = item.date
+
+            when (item.id) {
+
+                0 -> image.setImageResource(R.drawable.caesar)
+
+                1 -> image.setImageResource(R.drawable.augustus)
+
+                2 -> image.setImageResource(R.drawable.tiberius)
+
+                3 -> image.setImageResource(R.drawable.caligula)
+
+                4 -> image.setImageResource(R.drawable.claudius)
+
+                5 -> image.setImageResource(R.drawable.nero)
+
+                6 -> image.setImageResource(R.drawable.galba)
+
+                7 -> image.setImageResource(R.drawable.otho)
+
+                8 -> image.setImageResource(R.drawable.vithelius)
+
+                9 -> image.setImageResource(R.drawable.vespasian)
+
+                10 -> image.setImageResource(R.drawable.titus)
+
+                11 -> image.setImageResource(R.drawable.domitian)
+
+            }
+
+        }
+
+        view?.setOnClickListener {
+
+            onItemClick(position)
+
+        }
+
+        return view
+
+    }
+
+
+
+    override fun getItem(position: Int) = items[position]
+
+
+
+    override fun getItemId(position: Int) = items[position].id.toLong()
+
+
+
+    override fun getCount() = items.size
+
+
+
+    private class ListViewHolder(view: View?) {
+
+        val name: TextView = view?.findViewById(R.id.emperorName) as TextView
+
+        val date: TextView = view?.findViewById(R.id.emperorDate) as TextView
+
+        val image: ImageView = view?.findViewById(R.id.emperorImage) as ImageView
+
+    }
+
+
+
+    private fun onItemClick(position: Int) {
+
+        items[position].itemClick()
+
+    }
+
+}
+
+#Android #AdapterView

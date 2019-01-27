@@ -1,0 +1,69 @@
+-> Notifications
+
+	- head-up notification - появляется поверх приложения
+
+	- channels - >= API 26 (Android O)
+
+	
+
+	- создаем билдер, заполняем параметры нотификации, запускаем ее:
+
+	
+
+		Notification.Builder builder = new Notification.Builder(context);
+
+		
+
+		builder .setContentIntent(contentIntent)
+
+				.setSmallIcon(R.drawable.ic_launcher_cat)
+
+				.setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.hungrycat))
+
+				.setTicker(res.getString(R.string.warning)) //текст в строке состояния
+
+				.setWhen(System.currentTimeMillis())
+
+				.setAutoCancel(true)
+
+				.setContentTitle(res.getString(R.string.notifytitle)) //заголовок уведомления
+
+				.setcontentText(res.getString(R.string.notifytext)); //текст уведомления
+
+				
+
+		//Notification notification = builder.getNotification(); //до API 16
+
+		Notification notification = builder.build();
+
+		
+
+		NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		notificationManager.notify(NOTIFY_ID, notification);
+
+		
+
+	- можем:
+
+		- группировать
+
+		- звук
+
+		- вибрация
+
+		- управлять светодиодом
+
+		- обновлять состояние по ID
+
+		- свой layout для нотификации
+
+		- задать иконку и картинку
+
+		- задать приоритет
+
+		- задать категорию
+
+		- задать контакт по URI
+
+#Android #Notifications

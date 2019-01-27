@@ -1,0 +1,23 @@
+-> Geolocation
+
+	- GPS
+
+	- Android Network Location Provider
+
+	- Geolocation API from Google Play Services
+
+
+
+-> Geofencing
+
+	- тригер на вход, нахождение некоторое время и выход
+
+	- Pending Intent
+
+	
+
+-> Background Limitations
+
+	
+
+#Android #Geolocating

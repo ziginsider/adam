@@ -1,0 +1,168 @@
+-> Services
+
+	- отличия сервисов в бэкгроунд потоке и других операций в бэкгроунд потоке: сервисы не зависят от взаимодействия с пользователем напрямую (напр. проигрывание музыки, загрузка файла из сети), но могут быть инициированны пользователем.
+
+	- виды:
+
+		- Started (запустили и все)
+
+		- Bound - (подгрузка файла, нужны сведения о прогрессе)
+
+		- Scheduled (API level 21) (по расписанию, оптимизация работы с ресурсами)
+
+		- In foreground (пользрватель видит нотификацию)
+
+		
+
+	- деклларация сервиса в манифесте
+
+		- закрытие паблик-доступа к сервису: 
+
+		<service android:name=".MainService"
+
+			android:exported="false" />
+
+			
+
+	-
+
+	//запускается в UI-потоке
+
+	@Override
+
+	onStartCommand(Intent intent, int flags, int startId) {
+
+		super.onCreate();
+
+	}
+
+	
+
+	@Override
+
+	public IBinder onBind(Intent intent) {
+
+		return null;
+
+	}
+
+	
+
+	- IntentService - создает за на бэкгроунд-поток и ставит все задачи в очередь.
+
+		- - onHandleIntent(Intent intent) - create new thread, allow completing small tasks fast
+
+		
+
+	- Bind Services
+
+		- onBind() returns IBinder
+
+		- onUnbind() - unbind from service
+
+		
+
+	- onStartCommand() возвращает int Service.Flags, определяющие стратегию повторного запуска службы после внезапной остановки:
+
+		- START_NOT_STICKY - не создавать службу повторно
+
+		- START_STICKY - повторно выполнить с intent = null
+
+		- START_REDELIVER_INTENT - повторно выполнить с последним intent
+
+	
+var myService: MyService? = null
+
+    var isBound = false
+
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+
+        super.onCreate(savedInstanceState)
+
+        setContentView(R.layout.activity_main)
+
+
+
+        val intent = Intent(this, MyService::class.java)
+
+        intent.putExtra("URL",
+
+                "https://upload.wikimedia.org/wikipedia/en/7/76/Darth_Vader.jpg")
+
+        bindService(intent, myConnection, Context.BIND_AUTO_CREATE)
+
+    }
+
+
+
+    private val myConnection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName?, service: IBinder?) {
+
+            val binder = service as MyService.MyBinder
+
+            myService = binder.getService()
+
+            isBound = true
+
+        }
+
+
+
+        override fun onServiceDisconnected(p0: ComponentName?) {
+
+            isBound = false
+
+        }
+
+    }
+
+-------------------
+
+class MyService: Service() {
+
+
+
+    private val myBinder = MyBinder()
+
+
+
+    private var dowloadManager : DownloadManager? = null
+
+    private var url : URL? = null
+
+    private var downloadEnqueue : Long? = null
+
+
+
+    override fun onBind(intent: Intent?): IBinder {
+
+        val str = intent?.extras?.get("URL")
+
+        url = URL(str as String?)
+
+        DoBackgoundTask().execute(url)
+
+        return myBinder //TODO check null
+
+    }
+
+    inner class MyBinder: Binder() {
+
+        fun getService() : MyService {
+
+            return this@MyService
+
+        }
+
+    }
+
+ 
+
+-> Alarm Manager (старый старый)
+
+
+
+#Android #AndroidService #Servicies

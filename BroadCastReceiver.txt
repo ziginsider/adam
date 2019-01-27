@@ -1,0 +1,107 @@
+-> Broadcasts
+
+	- для перехвата широковещательных запросов
+
+	- можно регистрировать через манифест
+
+	- можно регистрировать через код
+
+	- бывают Sticky - т.е. получают уведомление о событии даже если оно произошло до регистрации ресивера
+
+	- реализуют одну функцию void onReceive(Context context, Intent intent)
+
+	- выполняются в основном потоке
+
+	- применяется для взаимодействия с сервисом
+
+	
+
+	- samples:
+
+	void SomeFunc1() {
+
+		Intent intent = new Intent("ru.mail.sample.TEST_BR");
+
+		intent.putExtra("data1", var1);
+
+		intent.putExtra("data2", var2);
+
+		sendBroadcast(intent);
+
+	}
+
+	
+
+	void SomeFunc2() {
+
+		Intent intent = new Intent("ru.mail.sample.TEST_BR");
+
+		intent.putExtra("data1", var1);
+
+		intent.putExtra("data2", var2);
+
+		sendOrderedBroadcast(intent, "ru.mail.sample.MY_BR_PERMISSION");
+
+	}
+
+	
+
+	- пример ресивера:
+
+	public class MessageReceiver extends BroadcastReceiver {
+
+		public MessageReceiver() {}
+
+		
+
+		@Override
+
+		public void onReceive(Context context, Intent intent) {
+
+			Toast.makeText(context, "Получено сообщение: " + 
+
+				intent.getStringExtra("ru.mail.sample.TEST_BR"),
+
+				Toast.LENGTH_LONG).show();
+
+		}
+
+		
+
+	- пример регистрации ресивера:
+
+	@Override
+
+	public void onCreate (Bundle savedInstanceState) {
+
+		super.onCreate(savedInstanceState);
+
+		br = new MessageReceiver();
+
+		//create filter
+
+		IntentFilter intFilt = new IntentFilter("ru.mail.sample.TEST_BR");
+
+		//register
+
+		registerReceiver(br, intFilt);
+
+	}
+
+	
+
+	@Override
+
+	protected void onDestroy() {
+
+		super.onDestroy();
+
+		unregisterReceiver(br);
+
+	}
+
+	
+
+	
+
+#Android #BroadcastReceiver

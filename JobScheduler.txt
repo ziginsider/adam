@@ -1,0 +1,79 @@
+-> Job Scheduler
+
+	- добавлен с API level 21 (более раннее (KitKat) есть JobDispatcher)
+
+	- никогда не выполняется прямо сейчас
+
+		- устройство заряжается
+
+		- сетевое подключение без ограничений
+
+		- устройство не в роуминге
+
+		- устройство в состоянии Idle
+
+		- не ранее чем...
+
+		- не позднее чем...
+
+		- в течении
+
+	- onStartJob()
+
+	- onStopJob()
+
+	- объявляется в манифесте
+
+	- чаще используется для планирования сетевых взаимодействий
+
+	
+
+	-  //JobInfo:
+
+	JobInfo.Builder builder = new JobInfo.Builder();
+
+	builder.setBackoffCriteria(initalBackoff, policy)
+
+			.setExtras(bundle)
+
+			.setMinimumLatency(latency)
+
+			.setOverrideDeadline(maxDelay)
+
+			.setPeriodic(period)
+
+			.setPersisted(isPersisted)
+
+			.setRequiredNetworkType(type)
+
+			.setRequiresCharging(isRequiresCharging)
+
+			.setRequiresDeviceIdle(isRequiresIdle)
+
+			.setTriggerContentMaxDelay(maxDelay)
+
+			.setTriggerContentUpdateDelay(delay);
+
+	JobInfo info = builder.build();
+
+
+
+	//run:
+
+	JobScheduler scheduler = (JobScheduler) context.getSystemService(JOB_SCHEDULER_SERVICE);
+
+	scheduler.schedule(info);
+
+	
+
+	- альтернативы:
+
+		- https://github.com/path/android-priority-jobqueue
+
+		- https://github.com/yigit/android-priority-jobqueue
+
+		- https://github.com/evernote/android-job
+
+		
+
+#Android #Jobsheduling #JobScheduler
