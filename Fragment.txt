@@ -1,0 +1,342 @@
+
+#lection8 -> Fragment -> 2018-03-30
+
+
+
+-> Появились в Android 3.0. View стараются помещать во фрагменты, которые аттачатся в Activity.
+
+
+
+-> lifecycle
+
+
+
+-> конструктор фрагмента только родной используем, без параметров. Данные через Bundle. Т.к. при пересоздании фрагменту неоткуда будет взять необходимые параметры.
+
+
+
+-> Creating Fragment
+
+	- inflate()
+
+	
+
+-> Add Fragment
+
+
+
+	- with layout
+
+		- можно задать кастомные аттрибуты:
+
+		в xml:
+
+		<fragment
+
+			android:name="io.github.ziginsider.MyFragment"
+
+			...
+
+			custom:my_attribute="..."
+
+		/>
+
+		в коде:
+
+		void onInflate(Context context, AttributeSet attrs, Bundle ...)
+
+		этот метод вызываем только если декларируем фрагмент в xml
+
+		
+
+	- programmatically
+
+		- как создать?
+
+			- Получить FragmentManager
+
+			- Проверить добавлен ли Fragment (!!!):
+
+				
+
+				private Fragment getCurrentFragment() {
+
+					FragmentManager fragmentManager = getSupportFragmentManager();
+
+					String fragmentTag = fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount() - 1).getName();
+
+					Fragment currentFragment = fragmentManager.findFragmentByTag(fragmentTag);
+
+					return currentFragment;
+
+				}
+
+				
+
+				||
+
+				
+
+				FragmentManager fm = getSupportFragmentManager();
+
+				if (fm.findFragmentByTag("tag") == null) {
+
+					fm.beginTransaction()
+
+						.add(R.id.container,
+
+							MyFragment.newInstance(1, 2),
+
+							"tag")
+
+						.addToBackStack(null); //если необходимо backpress
+
+						.commit();
+
+				}
+
+				
+
+			- Начать транзакцию
+
+			- Создать и добавить Fragment
+
+			- Завершить транзакцию
+
+			
+
+		- commit() - отложенный вызов (на след. фрейме)
+
+			
+
+-> NewInstance vs Constructor с параметрами. Вроде как Гугл не разрешает создавать фрагменты у которых добавлен коструктор с параметрами и требует для создания фрагмента использовать механизм newInstance т.е. передавать данные как Bundle. Но я делал так: 1) создавал абстрактный класс фрагмента (т.е. с extends Fragment) и создавал там конструктор с параметрами. Потом наследовался от этого абстрактного фрагмента и в дочерних фрагментах переопределял конструктор без параметров, где вызывал конструктор родителя с параметрами:
+
+	super(R.layout.fragment_third, R.id.frame_third_fragment);
+
+Все работало.
+
+Вообще инстанцировать фрагмент через конструктор не рекомендуется по той причине, что во время пересоздания фрагмента системой (смена конфигурации) будет вызван конструктор без параметров: следовательно наши данные, передаваемые через конструктор, потеряюся. Но в ситуации приведенной выше, мы как раз переопределяем конструктор без параметров, который и будет вызываться всякий раз системой, когда ей это необходимо. В самом конструкторе мы вызываем конструктор родителя с параметрами.
+
+Но быть может это не слишком верный подход с архитектурной точки зрения? (Я в параметрах конструктора передаю layout, раздуваемый фрагментом и id View, с которой необходимо работать).
+
+Можно, конечно, легко убрать конструктор с параметрами и из абстрактного класса. Для получения необходимых параметров, которые ранее передавались классом-наследником через конструктор, необходимо объявить в абстрактном классе абстрактные методы, которые возвращают нужные параметры. Таким образом, класс-наследник будет вынужден их переопределить. 
+
+	
+
+	- инстанцировать через NewInstance:
+
+	
+
+	//в классе фрагмента создаем метод:
+
+	public static Fragment newInstance(int param1, int param2, ...) {
+
+		Bundle arguments = new Bundle();
+
+		arguments.putInt(PARAM1_KEY, param1);
+
+		arguments.putInt(PARAM2_KEY, param2);
+
+		... 
+
+		Fragment fragment = new MyFragment();
+
+		fragment.setArguments(arguments);
+
+		return fragment;		
+
+	}
+
+	
+
+	//использовать в классе фрагмента
+
+	getArguments().getInt("PARAM1_KEY");
+
+	
+
+	||
+
+	
+
+	//или в Kotlin:
+
+	companion object {
+
+		fun newInstance(first: String, second: String) : SampleFragment {
+
+			return SampleFragment().apply {
+
+				arguments = Bundle().apply {
+
+					putString("firstString", first)
+
+					putString("secondString", second)
+
+				}
+
+			}
+
+		}
+
+	}
+
+	
+
+	//используем:
+
+	val first: String by lazy { arguments.getString("firstString") }
+
+	val second: String by lazy { arguments.getString("secondString") }
+
+
+
+
+
+-> No-ui Fragment - есть код который должен быть в Activity, но мы не хотим его наследовать. Тогда функциональность можно запихнуть в Fragment. Ему нужно присвоить тэг: findFragmentByTag(). Нужно установить свойство Retain instace = true, чтобы при смене конфигурации фрагмент не пересоздавался. При этом в таких фрагментах не рекомендуется хранить view.
+
+
+
+-> onDestroy() может не вызываться системой, не стоит очищать критические ресурсы.
+
+
+
+-> onDestroyView() - нужно обнулить все ссылки на view
+
+
+
+-> android.support.v4.app.Fragment
+
+
+
+-> Как фрагменту взаимодействовать с Activity?
+
+	
+
+	//нужно создать интерфейс, который будет реализован в Activity:
+
+	public class MyFragment extends Fragment {
+
+		interface MyEventListener {
+
+			void onEvent();
+
+		}
+
+		...
+
+	}
+
+	
+
+	//затем проверяем реализует ли Activity этот интерфейс:
+
+	MyEventListener listener;
+
+	
+
+	@Override
+
+	public void onAttach(Context context) {
+
+		super.onAttach(context);
+
+		if (!(getActivity() instanceof MyEventListener)) {
+
+			throw new ClassCastException(context.toString() + " must implement MyEventListener");
+
+		}
+
+		listener = (MyEventListener) getActivity();
+
+		
+
+	//обнулить listener в методе
+
+	@Override
+
+	public void onDetach() {
+
+		super.onDetach();
+
+		listener = null;
+
+	}
+
+	
+
+	|| см. https://github.com/onmyway133/blog/issues/108 - в т.ч. и на Kotlin есть
+
+	
+
+-> Nested Fragment
+
+-> Как фрагменту взаимодействовать с другим фрагментом?
+
+	- выбрать два сценария: "братья" или "отцы и дети"
+
+		- братья Fragment A & Fragment B:
+
+			A.getTargetFragment()
+
+			setTargetFragment(B)
+
+			targetFragment - м.б. только один
+
+		- отцы и дети:
+
+			A.getChildFragmentManager()
+
+			B.getParentFragment()
+
+	|| 
+
+	- через Activity в качестве контроллера
+
+		- https://stackoverflow.com/questions/13700798/basic-communication-between-two-fragments
+
+			
+
+-> State loss
+
+	- java.lang.IllegalStateException
+
+	- происходит после серии: Activity.onSaveInstanceState(Bundle) -> FragmentTransaction.commit()
+
+	- где лучше вызывать commit() ?
+
+		- onCreate()
+
+		- FragmentActivity#onResumeFragments()
+
+		- onPostResume()
+
+	- опасные в этом смысле методы:
+
+		- onResume(), onStart(), onActivityResult()
+
+	+ совет не выполнять транзакции внутри асинхронных вызовов коллбэков
+
+	- метод FragmentTransaction#commitAllowingStateLoss() - делает все что и commit(), но не проверяет было ли сохранено состояние. Это опасный метод в том смысле, что после смены конфигурации пользователь может получить другое состояние экрана.
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+		
+
+#Android #Fragments
