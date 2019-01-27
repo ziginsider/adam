@@ -1,0 +1,34 @@
+корутины Kotlin:
+
+private fun fibonacciSequence(n: Int) = buildSequence {
+        var cur = 1
+        var next = 1
+        repeat(n) {
+            yield(cur)
+            val tmp = cur + next
+            cur = next
+            next = tmp
+        }
+    }
+
+или
+
+private fun fibonacciSequence() = buildSequence {
+        var cur = 1
+        var next = 1
+        while (true) {
+            yield(cur)
+            val tmp = cur + next
+            cur = next
+            next = tmp
+        }
+    }
+
+val iter = fibonacciSequence().iterator()
+        repeat(25) {
+            Log.i(TAG, "${iter.next()}")
+        }
+
+код просыпается после каждого запроса (благодаря yield)
+
+#Kotlin

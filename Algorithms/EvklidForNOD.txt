@@ -1,0 +1,15 @@
+public static long ev(long a, long b) 
+
+{
+
+    assert(a > 0);
+
+    if (b > 0) {
+
+        return ev(b, a % b);
+
+    }
+
+    return a;
+
+}
