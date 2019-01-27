@@ -1,0 +1,145 @@
+Example: Assembling a JAR for a source set
+
+build.gradle
+
+task intTestJar(type: Jar) {
+    from sourceSets.intTest.output
+}
+
+------------
+in buildSrc:
+
+task copyDependencies(type: Copy) {
+    from configurations.default
+    into 'libs'
+}
+
+build {}.dependsOn copyDependencies
+
+------
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+version = '1.0'
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',  
+        	'Implementation-Version': version,
+        	'Main-Class': 'com.mkyong.DateUtils'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+//Get dependencies from Maven central repository
+repositories {
+    mavenCentral()
+}
+
+//Project dependencies
+dependencies {
+	compile 'ch.qos.logback:logback-classic:1.1.2'
+}
+------------------------
+
+https://habr.com/post/267311/
+
+----------------------
+
+Проектные зависимости — зависимость от модуля (подпроекта) в рамках одного проекта:
+// build.gradle
+dependencies {
+	compile project(':subproject')
+}
+
+---------------
+
+– Файловые зависимости — зависимости, подключаемые как файлы (jar/aar архивы):
+// build.gradle
+repositories {
+	flatDir {
+		dirs 'aarlibs' // инициализируем папку, хранящую aar-архивы как репозиторий
+	}
+}
+
+dependencies {
+	compile(name:'android_library', ext:'aar') // подключаем aar-зависимость
+	compile files('libs/a.jar', 'libs/b.jar')
+	compile fileTree(dir: 'libs', include: '*.jar')
+}
+
+или
+
+repositories {
+    flatDir {
+        dirs 'path_to_folder_with_aar'
+    }
+}
+После этого можно подключать библиотеку:
+
+dependencies {
+   compile 'com.example:library:1.0.0@aar'
+}
+
+---------------------
+Посмотреть дерево зависимостей:
+
+~ ./gradlew %module_name%:dependencies --configuration %compile%
+
+-----------------------
+Посмотреть как разрешается зависимость:
+
+~ ./gradlew %module_name%:dependencyInsight --dependency %jsontoken% --configuration %compile%
+
+--------------------------
+
+apply plugin: 'java'
+
+task customJar(type: Jar) {
+    manifest {
+        attributes firstKey: 'firstValue', secondKey: 'secondValue'
+    }
+    archiveName = 'hello.jar'
+    destinationDir = file("${buildDir}/jars")
+    from sourceSets.main.output
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,112 @@
+----------------------------------------------------------------------------------------
+To run block code before elvis operator
+>>>
+val call = event.call ?: kotlin.run {
+            logWarning("onEventMainThread(): WhiteboardElementRemovedEvent: call is null")
+            return
+}
+------------------------------------------------------------------------------------------
+When exhaustive
+(If we aren't comfortable leaving those potential branches unhandled)
+>>>
+val Any?.exhaustive get() = Unit  
+
+private fun onStatusChanged(status: Status) {  
+     when (status) {
+        is Status.Idle -> // ...
+        is Status.Fetching -> // ...
+        is Status.Fetched -> // ...
+        //maybe Status.Error also exists
+    }.exhaustive
+}
+
+or
+
+object Do { inline infix fun<reified T> exhaustive(any: T?) = any }
+
+Do exhaustive when (sealedClass) {
+    is SealedClass.First -> doSomething()
+    is SealedClass.Second -> doSomethingElse()
+}
+
+https://stackoverflow.com/questions/38169933/force-compilation-error-with-sealed-classes
+------------------------------------------------------------------------------------------------
+
+#КОРУТИНЫ
+
+любой элемент корутин-контекста можно достать внутри корутины:
+
+launch {
+    val job = coroutineContext[Job]!!
+    val interceptor = coroutineContext[CoroutineInterceptor]!!
+}
+
+более того, элементы контекста можно создавать самому.
+---
+
+выполни этот кусок кода с таймаутом 10 секунд:
+
+launch {
+    withTimeout(10, TimeUnit.SECONDS) {
+        ...
+    }
+}
+---
+
+CSP  - comunicating sequential processes
+
+-----------------------------------------------------------------------------------------------
+работа с диапазоном чисел:
+
+fun IntRange.forEachUpAndDown(action: (Int) -> Unit) {
+    forEach(action)
+    reversed().forEach(action)
+}
+
+fun main(args: Array<String>) {
+    (0..6).forEachUpAndDown {
+        println(it)
+    }
+}
+
+или для вывода 0001.....1000
+(0..1000)
+    .map { it.toString().padStart(4, '0') }
+    .forEach(::println)
+
+целые числа в диапазоне?
+val a = 2
+val b = 0
+val end = if (setOf(a, b).all { it in 0..2 }) 
+    true.also { println ("Yes!!") }
+else
+    false.also { println("Invalid move!") }
+---------------------------------------------------------------------------------------------
+
+Android KTX is a set of Kotlin extensions that is part of the Android Jetpack family.  And I investigate how this library work. And I try to use it in some of places in our project.
+
+9982 I'll have to Move gradle plugins like symlink, generatestring, generatelicense et cetera, from buildSrc directory ill have to move it to the separate project in our androidclien directory
+
+Make jar files from gradle plugings and include it to the project
+
+AAC-9785
+It's like task in previous task, I will to add content discriptions to several views to add apportunity for QA to distinguish types of video content. There are screnshare, video of camera or none of video content
+
+
+------------------
+if (activity is ConversationDetailsActivity) {
+            activity.component
+                .plusConversationDetails(ConversationDetailsModule(getConversationId(), this, activity))
+                .inject(this)
+        } else {
+            throw ClassCastException(
+                "Expected activity type: ConversationDetailsActivity. Actual ${activity.javaClass.simpleName}"
+            )
+        }
+
+__---_________
+
+Mockk
+- мокирование final полей
+- тест функции с параметрами поумолч
+- тестирование корутин и функциональных ф
