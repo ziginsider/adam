@@ -1,0 +1,179 @@
+#lection9 -> 2018-04-04 -> View and Layouts, Part 1
+
+
+
+-> View
+
+	- позиционирование: от левого верхнего угла X, Y
+
+	- elevation - отвечает за условную координату Z
+
+	- неявное использование оси Z: в порядке добавления view в контейнер, последние добавленные будут сверху
+
+	- все view прямоугольники
+
+	
+
+-> виды view (условные)
+
+	- Widget (View)
+
+	- Container or layout (ViewGroup)
+
+	- Adaptees (AdapterView) - списки элементов, исподьзуя класс адаптера
+
+	
+
+-> Добавление View
+
+	- через код
+
+		+ производительность
+
+		- но много кода для обработки смены состояний
+
+		- когда бывает нужно: когда от бэкэнда получаем view
+
+	- через view
+
+		+ обработку смены состояний будет обрабатывать сам инфлейтер
+
+		- чуть медленнее
+
+		
+
+-> atributes and properties
+
+	- в большинстве случаев совпадают, но есть непересечения
+
+	- atributes
+
+		- id - уникальный идентификатор. Должны быть уникальны в рамках родительского контейнера.
+
+		- findViewById() вызывается относительно родительского контейнера, и возвращает первый найденный
+
+		- явное задание id позволяет для многих view не сохранять явно их состояние в Bundle (с какой-то там версии :)), система сама это сделает (но не все аттрибуты)
+
+		
+
+-> Input Events
+
+	- есть возможность одно событие onClick задать через xml
+
+		- так нельзя сделать с onLongClick
+
+		- нет проверки времене компиляции
+
+		- хитрость: во Fragment определить кнопку, задать через xml событие onClick, и этот метод будет обработан в Activity
+
+		
+
+-> ButterKnife
+
+	
+
+-> Containers or Layouts (ViewGroup)
+
+	- FrameLayout - simplest layout
+
+	- LinearLayout
+
+		- horizontal
+
+		- vertical
+
+		- можно задавать weight для дочерних элементов и weightSum (по ум. = 1) для LinearLayout. Weight имеет наименьший приоритет.
+
+	- RelaitiveLayout
+
+		- relate each other
+
+	- ConstraintLayout(??)
+
+	- DrawerLayout
+
+	- ScrollView
+
+		- умеет скроллить только один child
+
+		- проблема вложенных скроллов
+
+		- есть HorizontalScrollView
+
+	
+
+-> Layout Parameters
+
+	- зависят од типа контейнера
+
+	- класс LayoutParams
+
+	- просчет view	
+
+	
+
+		- (первый проход по дереву) на этапе measure используется MeasureSpec вместо обычных размеров. MeasureSpec состоит:
+
+			- Размер
+
+			- Режим (определяет требования к размеру контейнера для чайлда)
+
+				- UNSPECIFIED - сколько угодно
+
+				- EXACTLY - столько сколько сказали
+
+				- AT_MOST - столько, сколько выйдет
+
+				
+
+		- MeasureState - ответ ребенка родителю (в случае AT_MOST)
+
+			- 0 - все хорошо
+
+			- MEASURE_STATE_TOO_SMALL - ребенок запрашивал больше места, чем ему разрешено родителем
+
+			
+
+		- Layout Pass (второй проход по дереву, когда view получают окончательные размеры)
+
+			- viewgroup.layout(parentLeft, parentTop, parentRight, parentBottom) - сначала родитель получает layout от своего родителя
+
+			- viewgroup.onLayout(changed, parentLeft, parentTop, parentRight, parentBottom) - вызывается у родителя, changed - флаг - изменилось ли что-нибудь после предыдущего шага
+
+			- view.layout(left, top, right, bottom) - дергаем layout конкретных размеров
+
+			- view.onLayout(changed, left, top, right, bottom) - может у него есть дети...
+
+	
+
+	- requestLayout() - выполняется долго и для всего дерева, избегать его вызова
+
+	- invalidate() - если view меняет вид, но не размеров (для размеров совместно requestLayout() и invalidate())
+
+	- Therefore, to be certain a relayout will result in a redraw, then you should pair an invalidate() with the requestLayout(). (The opposite is not true, though. If you only need a redraw, then there is no need to call requestLayout(). A single invalidate() will do.)
+
+	
+
+	- Что нужно сделать для написания кастомного view:
+
+		- определить данные, которые будут использоваться для размещения - написать LayoutParams
+
+		- определить механизм изменения размеров - написать onMeasure
+
+		- oпределить механизм размещения дочерних View - написать onLayout
+
+		- написать onDraw()
+мой телефон +375 44 484 55 56
+		
+
+	
+
+	
+
+	
+
+	
+
+	
+
+#Android  #View

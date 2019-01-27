@@ -1,0 +1,164 @@
+#lection10 -> 2018-04-06 -> View
+
+
+
+-> View -> TextView -> EditText -> Button -> Compaund button (radio button, checkbox, trigger...)
+
+
+
+-> ImageView - не входит в иерархию
+
+
+
+-> ImageLoading 
+
+	- Picasso
+
+	- UImageLoader
+
+	- Glide
+
+	- Fresco
+
+
+
+	- картинки кэшируются LRU - на слабых ссылках, или переодически очищаются
+
+	
+
+-> ActionBar
+
+	- кнопка App (назад, левый верхний угол) - логический переход назад
+
+	- кнопки действий - справа
+
+	
+
+-> Menu 
+
+
+
+-> Toolbar
+
+	- since API Level 21
+
+	- замена ActionBar (ActionBar остался как концепция)
+
+	- располагается обычно внутри AppBarLayout (т.е. внутри ActionBar)
+
+	- но можно располагать где угодно т.к. это отдельная View
+
+	
+
+-> Support Libraries для View
+
+
+
+-> Custom View
+
+	- constructors
+
+	- in values/attrs.xml: 
+
+	<resources>
+
+		<declare-styleable name="CustomView">
+
+			<attr name="customeAttribute" format=""/>
+
+		</declare-styleable>
+
+	</resources>
+
+	
+
+	TypedArray a = contex.getTheme().obtainStyledAttributes(
+
+		attr,
+
+		R.styleable.CustomView,
+
+		0, 
+
+		0);
+
+	try {
+
+		int index = R.styleable.CustomView_customAttribute;
+
+		boolean customeAttribute = a.getBoolean(index, false);
+
+	} finally {
+
+		a.recycle();
+
+	}
+
+
+
+	- custom drawing
+
+		- onDraw() - все "кисти" - объекты Paint - лучше готовить заранее
+
+		- onSizeChange() - вызывается  до рисования, как только получен новый размер View
+
+	
+
+	- Adding Interactivity
+
+		- onTouchEvent(MotionEvent event) {
+
+			gestureDetector.onTouchEvent(event);
+
+			return true; //события будут поступать в эту View
+
+		
+
+		- GestureDetector.OnGestureListener gestureListener =
+
+			new GestureDetector.SimpleOnGestureListener() {
+
+				@Override
+
+				public void onLongPress(MotionEvent e) {
+
+					Log.d("Gesture", "onLongPress");
+
+				}
+
+			};
+
+			
+
+		- onInterceptTouchEvent - метод для прокидывания события родительскому View
+
+		
+
+	- Save and Restore state - для автоматического сохранения полей View c id в Bundle 
+
+		- onSaveInstanceState
+
+		- onRestoreInstanceState
+
+		
+
+-> Compaund View - более простое написание кастомных View
+
+	
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Android #CustomView
