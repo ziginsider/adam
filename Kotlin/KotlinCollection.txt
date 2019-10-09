@@ -1,0 +1,29 @@
+## Kotlin Collections
+
+### Sequence vs Collections
+
+Use sequences: 
+- many elements and only fileter(), map(), take()
+- there are contains(), indexOf(), any(), none(), find(), first()
+- only foreEach()
+
+Use collections:
+- consist toList(), toSet()
+- there are stateful operations, such as sorting functions ( sortetBy(), sort() ) or distinct functions (which use a HashSet to keep track of which elements have been seen)
+
+E.G. Sequence:
+```
+val sequence = generateSequence { Random.nextInt() }
+sequence.take(10).forEach(::println)
+```
+
+Sequences support: fold(), reduce(), take(), drop()
+do not support: foldRight(), reduceRight(), takeLast(), dropLast(), slicing, reversing, union(), intersect(), getOrNull(), random()
+
+If you wanted, you could certainly implement some of these yourself, using the same trick as we saw that the standard library does for sorted(). For example, here’s a function to reverse a sequence:
+```
+fun <T> Sequence<T>.reversed() = object : Sequence<T> {
+    override fun iterator(): Iterator<T> =
+        this@reversed.toMutableList().also { it.reverse() }.iterator()
+}
+```
